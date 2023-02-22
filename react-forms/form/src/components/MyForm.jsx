@@ -7,8 +7,12 @@ export default function MyForm ({ user }) {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+
         console.log("Submitting the form...")
         console.log(name, email)
+        
+        setName("")
+        setEmail("")
     }
 
     return (
