@@ -1,14 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFetch } from "./hooks/useFetch"
 
 import './App.css'
 
 const urlBase = "http://localhost:3333/products";
 
-export default function App() {
-  const [products, setProducts] = useState([]);
-  
-  const { data : items, httpConfig } = useFetch(urlBase);
+export default function App() {  
+  const { data : items, httpConfig, loading, error } = useFetch(urlBase);
   
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
@@ -27,16 +25,20 @@ export default function App() {
       setName("");
       setPrice("");
     } 
-  }
+  };
 
   return (
     <div className="App">
       <h2>Product's List</h2>
-      <ul>
-        {items && items.map((item) => (
-          <li key={item.id}>{item.name} - ${item.price}</li>
-        ))}
-      </ul>
+      {loading && <p>Loading data...</p>}
+      {error && <p>{error}</p>}
+      {!error && (
+        <ul>
+          {items && items.map((item) => (
+            <li key={item.id}>{item.name} - ${item.price}</li>
+          ))}
+        </ul>
+      )}
       <div className="add-product">
         <form onSubmit={handleSubmit}>
           <label>
@@ -61,7 +63,7 @@ export default function App() {
             />
           </label>
           <br />
-          <input type="submit" value="Add Product" />
+          <input type="submit" value={loading ? "Sending..." : "Send"} disabled={loading} />
         </form>
       </div>
     </div>
