@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useFetch } from "./hooks/useFetch"
 
 import './App.css'
 
@@ -6,19 +7,11 @@ const urlBase = "http://localhost:3333/products";
 
 export default function App() {
   const [products, setProducts] = useState([]);
-
+  
+  const { data : items, httpConfig } = useFetch(urlBase);
+  
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-
-  useEffect(() => {
-    async function fetchData () {
-      const res = await fetch(urlBase);
-      const data = await res.json();
-
-      setProducts(data);
-    }
-    fetchData();
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,27 +21,19 @@ export default function App() {
       price
     };
 
-    const res = await fetch(urlBase, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(product),
-    });
-
-    const addedProduct = await res.json();
-
-    setProducts((prevProducts) => [...prevProducts, addedProduct]);
-
-    setName("")
-    setPrice("")
+    if (product.name !== "" && product.price !== "") {
+      httpConfig(product, "POST");
+      
+      setName("");
+      setPrice("");
+    } 
   }
 
   return (
     <div className="App">
       <h2>Product's List</h2>
       <ul>
-        {products.map((item) => (
+        {items && items.map((item) => (
           <li key={item.id}>{item.name} - ${item.price}</li>
         ))}
       </ul>
